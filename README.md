@@ -1,12 +1,3 @@
-这代码有没有文档呀？ 当然有啦，你已经下载了，在doc这个文件夹上，实在不知道，我就给链接出来咯：
-
-gitee：https://gitee.com/gz-yami/mall4j/tree/master/doc
-
-看云：https://www.kancloud.cn/yami/mall4j
-
-**开发环境搭建视频（推荐先看下文档再看视频）：https://www.bilibili.com/video/BV1eW4y1V7c1** 
-
-有声音了。如果视频对你有用，记得点赞投币噢。
 
 ## 授权
 
@@ -44,33 +35,3 @@ uni-app：https://gitee.com/gz-yami/mall4uni
 | lombok                 | 1.18.8 | 简化对象封装工具                        |
 | hutool                 | 5.7.22  | 更适合国人的java工具集                  |
 | knife4j                | 3.0.3  | 基于swagger，更便于国人使用的swagger ui |
-
-
-
-## 部署教程
-
-ps: 如果你不清楚如何启动我们的商城，请仔细阅wiki当中的文档
-
-
-https://gitee.com/gz-yami/mall4j/wikis
-
-**开发环境搭建视频（推荐先看下文档再看视频）：https://www.bilibili.com/video/BV1eW4y1V7c1** 
-
-有声音了。如果视频对你有用，记得点赞投币噢。
-
-
-
-## 相关截图
-
-
- 
-
-### 1. 后台截图
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1110/143738_88a8a1e6_5094767.gif "后台.gif")
-
-
-
-
-### 2. 移动端截图
-
-![输入图片说明](https://images.gitee.com/uploads/images/2021/1110/145209_2ec1ad04_5094767.png "开源移动端截图.png")
