@@ -1,8 +1,8 @@
 # 单节点设置
 singleServerConfig:
-  address: redis://127.0.0.1:18057
+  address: redis://127.0.0.1:6379
   database: 0
-  password: clock@@18057
+  password: richborn@@6379
   idleConnectionTimeout: 10000
   connectTimeout: 10000
   timeout: 3000
