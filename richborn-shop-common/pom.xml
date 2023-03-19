@@ -36,10 +36,10 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
-		<dependency>
-		    <groupId>com.qiniu</groupId>
-		    <artifactId>qiniu-java-sdk</artifactId>
-		</dependency>
+<!--		<dependency>-->
+<!--		    <groupId>com.qiniu</groupId>-->
+<!--		    <artifactId>qiniu-java-sdk</artifactId>-->
+<!--		</dependency>-->
 		<dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>

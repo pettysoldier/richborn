@@ -98,11 +98,11 @@
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.qiniu</groupId>
-                <artifactId>qiniu-java-sdk</artifactId>
-                <version>${qiniu.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.qiniu</groupId>-->
+<!--                <artifactId>qiniu-java-sdk</artifactId>-->
+<!--                <version>${qiniu.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>

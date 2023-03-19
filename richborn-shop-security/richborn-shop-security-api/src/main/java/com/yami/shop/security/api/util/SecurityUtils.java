@@ -15,6 +15,8 @@ import com.yami.shop.security.common.bo.UserInfoInTokenBO;
 import com.yami.shop.security.common.util.AuthUserContext;
 import lombok.experimental.UtilityClass;
 
+import java.util.Objects;
+
 /**
  * @author LGH
  */
@@ -32,7 +34,9 @@ public class SecurityUtils {
             throw new RuntimeException("yami.user.request.error");
         }
         UserInfoInTokenBO userInfoInTokenBO = AuthUserContext.get();
-
+        if(Objects.isNull(userInfoInTokenBO)){
+            return null;
+        }
         YamiUser yamiUser = new YamiUser();
         yamiUser.setUserId(userInfoInTokenBO.getUserId());
         yamiUser.setBizUserId(userInfoInTokenBO.getBizUserId());
