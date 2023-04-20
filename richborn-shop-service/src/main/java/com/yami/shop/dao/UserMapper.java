@@ -19,4 +19,6 @@ public interface UserMapper extends BaseMapper<User> {
 	User getUserByUserMail(@Param("userMail") String userMail);
 
 	User selectOneByUserName(@Param("userName") String userName);
+
+	User selectOneByOpenId(@Param("openId") String openId);
 }

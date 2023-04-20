@@ -22,6 +22,9 @@
     <result column="birth_date" jdbcType="CHAR" property="birthDate" />
     <result column="pic" jdbcType="VARCHAR" property="pic" />
     <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="session_key" jdbcType="VARCHAR" property="sessionKey" />
+    <result column="union_id" jdbcType="VARCHAR" property="unionId" />
+    <result column="open_id" jdbcType="VARCHAR" property="openId" />
   </resultMap>
 
   <select id="getUserByUserMail" resultType="com.yami.shop.bean.model.User">

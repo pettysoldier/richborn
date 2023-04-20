@@ -23,7 +23,7 @@ spring:
               driver: com.mysql.cj.jdbc.Driver
               URL: jdbc:mysql://127.0.0.1:3306/yami_shops?allowMultiQueries=true&useSSL=false&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&zeroDateTimeBehavior=convertToNull&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&nullCatalogMeansCurrent=true
               user: root
-              password: RDmKh0oRKyN1eKiZnHp3GB9NlO9auH6R
+              password: root
               maxConnections: 5
               provider: hikaricp
           #线程池配置

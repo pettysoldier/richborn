@@ -5,6 +5,7 @@ import com.yami.shop.bean.model.User;
 import com.yami.shop.common.exception.YamiShopBindException;
 import com.yami.shop.common.util.PrincipalUtil;
 import com.yami.shop.dao.UserMapper;
+import com.yami.shop.security.common.R;
 import com.yami.shop.security.common.bo.UserInfoInTokenBO;
 import com.yami.shop.security.common.dto.AuthenticationDTO;
 import com.yami.shop.security.common.enums.SysTypeEnum;
@@ -12,14 +13,15 @@ import com.yami.shop.security.common.manager.PasswordCheckManager;
 import com.yami.shop.security.common.manager.PasswordManager;
 import com.yami.shop.security.common.manager.TokenStore;
 import com.yami.shop.security.common.vo.TokenInfoVO;
+import com.yami.shop.security.common.wechat.CodeSessionDto;
+import com.yami.shop.service.IWxService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 
 /**
@@ -32,7 +34,7 @@ public class LoginController {
     @Autowired
     private TokenStore tokenStore;
 
-    @Autowired
+    @Resource
     private UserMapper userMapper;
 
     @Autowired
@@ -40,6 +42,9 @@ public class LoginController {
 
     @Autowired
     private PasswordManager passwordManager;
+
+    @Resource
+    IWxService wxService;
 
     @PostMapping("/login")
     @ApiOperation(value = "账号密码(用于前端登录)", notes = "通过账号/手机号/用户名密码登录，还要携带用户的类型，也就是用户所在的系统")
@@ -51,7 +56,7 @@ public class LoginController {
         String decryptPassword = passwordManager.decryptPassword(authenticationDTO.getPassWord());
 
         // 半小时内密码输入错误十次，已限制登录30分钟
-        passwordCheckManager.checkPassword(SysTypeEnum.ORDINARY,authenticationDTO.getUserName(), decryptPassword, user.getLoginPassword());
+        passwordCheckManager.checkPassword(SysTypeEnum.ORDINARY, authenticationDTO.getUserName(), decryptPassword, user.getLoginPassword());
 
         UserInfoInTokenBO userInfoInToken = new UserInfoInTokenBO();
         userInfoInToken.setUserId(user.getUserId());
@@ -62,6 +67,35 @@ public class LoginController {
         return ResponseEntity.ok(tokenInfoVO);
     }
 
+    @GetMapping("/wxlogin")
+    @ApiOperation(value = "微信登录", notes = "微信登录")
+    public R<TokenInfoVO> wxLogin(
+            @RequestParam(value = "code", name = "code") String code) {
+        R<CodeSessionDto> r = wxService.code2Session(code);
+        User user = findUser(r.getResult().getOpenid());
+        UserInfoInTokenBO userInfoInToken = new UserInfoInTokenBO();
+        if (user == null) {
+            //TODO 根据小程序获取的用户信息，创建用户资料。等秀秀提供
+
+        } else {
+            userInfoInToken.setUserId(user.getUserId());
+            userInfoInToken.setSysType(SysTypeEnum.ORDINARY.value());
+            userInfoInToken.setEnabled(user.getStatus() == 1);
+            userInfoInToken.setOpenId(r.getResult().getOpenid());
+            userInfoInToken.setSessionKey(r.getResult().getSession_key());
+            userInfoInToken.setUnionId(r.getResult().getUnionid());
+        }
+        // 存储token返回vo
+        TokenInfoVO tokenInfoVO = tokenStore.storeAndGetVo(userInfoInToken);
+        return R.ok(tokenInfoVO);
+    }
+
+
+    private User findUser(String openId) {
+        User user = userMapper.selectOneByOpenId(openId);
+        return user;
+    }
+
     private User getUser(String mobileOrUserName) {
         User user = null;
         // 手机验证码登陆，或传过来的账号很像手机号
@@ -69,7 +103,7 @@ public class LoginController {
             user = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUserMobile, mobileOrUserName));
         }
         // 如果不是手机验证码登陆， 找不到手机号就找用户名
-        if  (user == null) {
+        if (user == null) {
             user = userMapper.selectOneByUserName(mobileOrUserName);
         }
         if (user == null) {

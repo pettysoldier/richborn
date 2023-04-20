@@ -55,6 +55,12 @@ public class UserInfoInTokenBO {
      */
     private Set<String> perms;
 
+    private String sessionKey;
+
+    private String unionId;
+
+    private String openId;
+
     /**
      * 状态 1 正常 0 无效
      */
