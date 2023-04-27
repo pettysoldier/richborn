@@ -1,15 +1,27 @@
 package com.yami.shop.service.impl;
 
 
+import com.yami.shop.bean.wechat.WxPhoneInfoDto;
+import com.yami.shop.common.util.Json;
 import com.yami.shop.security.common.R;
 import com.yami.shop.security.common.wechat.CodeSessionDto;
 import com.yami.shop.service.IWxService;
+import com.yami.shop.utils.JsonUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -24,6 +36,8 @@ import java.util.Map;
  **/
 @Service
 public class WxServiceImpl implements IWxService {
+
+    private static final Logger log = LoggerFactory.getLogger(WxServiceImpl.class);
     @Resource
     RestTemplate restTemplate;
 
@@ -51,5 +65,30 @@ public class WxServiceImpl implements IWxService {
             codeSessionDto.setErrmsg(result.getBody().get("errmsg").toString());
         }
         return  R.ok(codeSessionDto);
+    }
+
+    public  R<WxPhoneInfoDto> getWxPhoneInfo(String accessToken, String phCode){
+        String url = "https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=" + accessToken;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        Map<String, String> paramMap = new HashMap<>(0);
+        paramMap.put("code", phCode);
+        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+        for (Map.Entry<String, String> entry : paramMap.entrySet()) {
+            multiValueMap.put(entry.getKey(), Arrays.asList(entry.getValue()));
+        }
+        HttpEntity<String> request = new HttpEntity(multiValueMap, headers);
+        try {
+            ResponseEntity<WxPhoneInfoDto> result = restTemplate.postForEntity(url, request, WxPhoneInfoDto.class);
+            if (result.getStatusCodeValue() != 200 || result.getBody().getErrcode() != 0) {
+                log.error("获取手机号出错：" + JsonUtils.toString(result));
+                return R.fail(-1, "获取手机号出错");
+            }
+
+            return R.ok(JsonUtils.toObject(JsonUtils.toString(result.getBody()),WxPhoneInfoDto.class));
+        } catch (Exception e) {
+            log.error("获取手机号异常:" , e);
+            return  R.fail(-1, "获取手机号出错");
+        }
     }
 }

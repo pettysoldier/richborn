@@ -3,6 +3,8 @@ package com.yami.shop.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.wechat.pay.contrib.apache.httpclient.util.PemUtil;
+import com.yami.shop.bean.wechat.WxPhoneInfoDto;
+import com.yami.shop.security.common.R;
 import okhttp3.HttpUrl;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -36,9 +38,9 @@ public class WechatUtil {
     //推送url
     public final static String PUSH_URL = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=";
 
-    public final static String APP_ID = "wxf656758734199544";//wx26d8b2d516c989d1
+    public final static String APP_ID = "wx381f16375560d587";//wx26d8b2d516c989d1
 
-    public final static String SECRET ="f61299837b32af06da9d33008d076349";//"1bbfceccf9c8d679d140364f482c029e";
+    public final static String SECRET ="36ad7d3e931872f08c730f88569501dd";//"1bbfceccf9c8d679d140364f482c029e";
 
     public final static String MCH_ID = "1597508881";
 
@@ -130,6 +132,8 @@ public class WechatUtil {
         }
         return null;
     }
+
+
 
     /**
      * 获取用户个人信息

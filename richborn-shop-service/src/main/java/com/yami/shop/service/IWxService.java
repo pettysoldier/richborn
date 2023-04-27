@@ -1,5 +1,6 @@
 package com.yami.shop.service;
 
+import com.yami.shop.bean.wechat.WxPhoneInfoDto;
 import com.yami.shop.security.common.R;
 import com.yami.shop.security.common.wechat.CodeSessionDto;
 
@@ -15,4 +16,5 @@ import com.yami.shop.security.common.wechat.CodeSessionDto;
  **/
 public interface IWxService {
     R<CodeSessionDto> code2Session(String code);
+    R<WxPhoneInfoDto> getWxPhoneInfo(String accessToken, String phCode);
 }
