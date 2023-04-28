@@ -1,4 +1,4 @@
-package com.yami.shop.security.common.wechat;
+package com.yami.shop.bean.wechat;
 
 import lombok.Data;
 

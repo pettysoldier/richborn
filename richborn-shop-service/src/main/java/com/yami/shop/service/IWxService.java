@@ -1,8 +1,9 @@
 package com.yami.shop.service;
 
+import com.yami.shop.bean.R;
+import com.yami.shop.bean.wechat.CodeSessionDto;
 import com.yami.shop.bean.wechat.WxPhoneInfoDto;
-import com.yami.shop.security.common.R;
-import com.yami.shop.security.common.wechat.CodeSessionDto;
+
 
 /**
  * ---------\,,,/---------

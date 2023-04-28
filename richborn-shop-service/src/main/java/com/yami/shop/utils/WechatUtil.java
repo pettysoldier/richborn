@@ -3,16 +3,11 @@ package com.yami.shop.utils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.wechat.pay.contrib.apache.httpclient.util.PemUtil;
-import com.yami.shop.bean.wechat.WxPhoneInfoDto;
-import com.yami.shop.security.common.R;
-import okhttp3.HttpUrl;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.springframework.core.io.ClassPathResource;
 
@@ -21,7 +16,10 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -406,37 +404,37 @@ public class WechatUtil {
      * @return 订单支付的参数
      * @throws Exception
      */
-    public static String V3PayPost(String reqUrl, String paramJsonStr) throws Exception {
-
-        //创建post方式请求对象
-        HttpPost httpPost = new HttpPost(reqUrl);
-        //装填参数
-        StringEntity s = new StringEntity(paramJsonStr, "utf-8");
-        s.setContentType("application/json");
-
-        //设置参数到请求对象中
-        httpPost.setEntity(s);
-        //指定报文头【Content-type】、【User-Agent】
-        httpPost.setHeader("Content-type", "application/json");
-        httpPost.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36");
-        httpPost.setHeader("Accept", "application/json");
-        //httpPost.setHeader("Authorization",getToken("POST",HttpUrl.parse(reqUrl),paramJsonStr));
-
-        //执行请求操作，并拿到结果（同步阻塞）
-        CloseableHttpResponse response = WxPayHttpClientFactory.httpClient.execute(httpPost);
-        int statusCode = response.getStatusLine().getStatusCode();
-        //获取数据，并释放资源
-        String body = closeHttpResponse(response);
-        if (statusCode == 200) { //处理成功
-            switch (reqUrl) {
-                case "https://api.mch.weixin.qq.com/v3/pay/transactions/app"://返回APP支付所需的参数
-                    return JSONObject.parseObject(body).getString("prepay_id");
-                case "https://api.mch.weixin.qq.com/v3/refund/domestic/refunds"://返回APP退款结果
-                    return body;
-            }
-        }
-        return null;
-    }
+//    public static String V3PayPost(String reqUrl, String paramJsonStr) throws Exception {
+//
+//        //创建post方式请求对象
+//        HttpPost httpPost = new HttpPost(reqUrl);
+//        //装填参数
+//        StringEntity s = new StringEntity(paramJsonStr, "utf-8");
+//        s.setContentType("application/json");
+//
+//        //设置参数到请求对象中
+//        httpPost.setEntity(s);
+//        //指定报文头【Content-type】、【User-Agent】
+//        httpPost.setHeader("Content-type", "application/json");
+//        httpPost.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36");
+//        httpPost.setHeader("Accept", "application/json");
+//        //httpPost.setHeader("Authorization",getToken("POST",HttpUrl.parse(reqUrl),paramJsonStr));
+//
+//        //执行请求操作，并拿到结果（同步阻塞）
+//        CloseableHttpResponse response = WxPayHttpClientFactory.httpClient.execute(httpPost);
+//        int statusCode = response.getStatusLine().getStatusCode();
+//        //获取数据，并释放资源
+//        String body = closeHttpResponse(response);
+//        if (statusCode == 200) { //处理成功
+//            switch (reqUrl) {
+//                case "https://api.mch.weixin.qq.com/v3/pay/transactions/app"://返回APP支付所需的参数
+//                    return JSONObject.parseObject(body).getString("prepay_id");
+//                case "https://api.mch.weixin.qq.com/v3/refund/domestic/refunds"://返回APP退款结果
+//                    return body;
+//            }
+//        }
+//        return null;
+//    }
 
     /**
      * 获取数据，并释放资源

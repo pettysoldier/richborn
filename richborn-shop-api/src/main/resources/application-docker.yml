@@ -15,5 +15,7 @@ spring:
   redis:
     redisson:
       config: classpath:redisson/redisson-docker.yml
+  main:
+    allow-circular-references: true
 logging:
   config: classpath:logback/logback-prod.xml

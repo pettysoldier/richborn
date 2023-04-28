@@ -1,4 +1,4 @@
-package com.yami.shop.security.common;
+package com.yami.shop.bean;
 
 /**
  * @author ly

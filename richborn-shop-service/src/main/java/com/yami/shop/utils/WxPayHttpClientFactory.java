@@ -35,7 +35,7 @@ public class WxPayHttpClientFactory {
     public static Verifier verifier;
 
 
-    @PostConstruct
+//    @PostConstruct
     public void initWXPayClient() {
         try {
             // 加载商户私钥（privateKey：私钥字符串）
