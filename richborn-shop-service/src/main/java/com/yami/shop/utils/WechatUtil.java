@@ -6,9 +6,9 @@ import com.wechat.pay.contrib.apache.httpclient.util.PemUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -30,9 +30,10 @@ import java.util.UUID;
  * @date 2019-09-11 16:49
  */
 public class WechatUtil {
-
+    private static final Logger log = LoggerFactory.getLogger(WechatUtil.class);
     //获取access_token
     public final static String ACCESS_TOKEN_URL = "https://api.weixin.qq.com/sns/oauth2/access_token?";
+    public final static String ACCESS_TOKEN_NO_CODE_URL = "https://api.weixin.qq.com/cgi-bin/token?";
     //推送url
     public final static String PUSH_URL = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=";
 
@@ -79,7 +80,8 @@ public class WechatUtil {
      */
     public static JSONObject getAccessToken(String code) {
 
-        String url = ACCESS_TOKEN_URL + "appid=" + APP_ID + "&secret=" + SECRET + "&code=" + code + "&grant_type=authorization_code";
+//        String url = ACCESS_TOKEN_URL + "appid=" + APP_ID + "&secret=" + SECRET + "&code=" + code + "&grant_type=authorization_code";
+        String url = ACCESS_TOKEN_NO_CODE_URL + "appid=" + APP_ID + "&secret=" + SECRET + "&grant_type=client_credential";
         PrintWriter out = null;
         BufferedReader in = null;
         String line;
@@ -109,10 +111,12 @@ public class WechatUtil {
             while ((line = in.readLine()) != null) {
                 sb.append(line);
             }
+            log.info("getAccessToken接口返回："+sb.toString());
             // 将获得的String对象转为JSON格式
             JSONObject jsonObject = JSONObject.parseObject(sb.toString());
             return jsonObject;
         } catch (Exception e) {
+            log.error(e.getMessage(),e);
             e.printStackTrace();
         }
         //使用finally块来关闭输出流、输入流

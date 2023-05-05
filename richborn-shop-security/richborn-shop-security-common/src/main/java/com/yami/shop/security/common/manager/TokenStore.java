@@ -233,6 +233,7 @@ public class TokenStore {
 
     private static String getApprovalKey(String sysType, String userId) {
         return userId == null?  sysType : sysType + StrUtil.COLON + userId;
+        //uid_to_access:0:2e17042b628a43268dd7a91853cc0854
     }
 
     private String encryptToken(String accessToken,Integer sysType) {

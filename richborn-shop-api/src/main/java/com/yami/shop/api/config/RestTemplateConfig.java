@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
@@ -16,6 +17,9 @@ import org.springframework.http.converter.support.AllEncompassingFormHttpMessage
 import org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter;
 import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * ---------\,,,/---------
@@ -62,6 +66,7 @@ public class RestTemplateConfig {
                 .requestFactory(this::clientHttpRequestFactory)
                 .messageConverters(new MappingJackson2XmlHttpMessageConverter(),
                         new StringHttpMessageConverter(),
+                        new WxMappingJackson2HttpMessageConverter(),
                         new ResourceHttpMessageConverter(false),
                         new AllEncompassingFormHttpMessageConverter(),
                         new ByteArrayHttpMessageConverter(),
@@ -70,6 +75,16 @@ public class RestTemplateConfig {
                 ).build();
         return template;
     }
+
+    public class WxMappingJackson2HttpMessageConverter extends MappingJackson2HttpMessageConverter {
+        public WxMappingJackson2HttpMessageConverter(){
+            List<MediaType> mediaTypes = new ArrayList<>();
+            mediaTypes.add(MediaType.TEXT_PLAIN);
+            mediaTypes.add(MediaType.TEXT_HTML);
+            setSupportedMediaTypes(mediaTypes);
+        }
+    }
+
     @Bean
     public CloseableHttpClient httpClient() {
         return HttpClientBuilder.create().build();

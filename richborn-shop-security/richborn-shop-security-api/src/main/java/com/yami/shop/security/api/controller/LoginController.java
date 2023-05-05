@@ -7,13 +7,12 @@ import com.yami.shop.bean.R;
 import com.yami.shop.bean.model.User;
 import com.yami.shop.bean.wechat.CodeSessionDto;
 import com.yami.shop.bean.wechat.WxPhoneInfoDto;
-import com.yami.shop.common.exception.YamiShopBindException;
 import com.yami.shop.common.util.PrincipalUtil;
 import com.yami.shop.common.util.RedisUtil;
 import com.yami.shop.dao.UserMapper;
-
 import com.yami.shop.security.common.bo.UserInfoInTokenBO;
 import com.yami.shop.security.common.dto.AuthenticationDTO;
+import com.yami.shop.security.common.dto.WxAuthenticationDTO;
 import com.yami.shop.security.common.enums.SysTypeEnum;
 import com.yami.shop.security.common.manager.PasswordCheckManager;
 import com.yami.shop.security.common.manager.PasswordManager;
@@ -21,14 +20,19 @@ import com.yami.shop.security.common.manager.TokenStore;
 import com.yami.shop.security.common.vo.TokenInfoVO;
 import com.yami.shop.service.IWxService;
 import com.yami.shop.service.UserService;
+import com.yami.shop.utils.JsonUtils;
 import com.yami.shop.utils.RichBornStringUtils;
 import com.yami.shop.utils.WechatUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -41,6 +45,7 @@ import java.util.Date;
 @RestController
 @Api(tags = "登录")
 public class LoginController {
+    private static final Logger log = LoggerFactory.getLogger(LoginController.class);
     @Autowired
     private TokenStore tokenStore;
 
@@ -79,35 +84,35 @@ public class LoginController {
         return ResponseEntity.ok(tokenInfoVO);
     }
 
-    @GetMapping("/wxlogin")
+    @PostMapping("/wxlogin")
     @ApiOperation(value = "微信登录", notes = "微信登录")
     public R<TokenInfoVO> wxLogin(
-            @RequestParam(value = "code", name = "code") String code,
-            @RequestParam(value = "phonenumbecode", name = "phonenumbecode") String phonenumbecode
+            @Valid @RequestBody WxAuthenticationDTO authenticationDTO
     ) {
         //获取微信accessToken
         String accessToken = RedisUtil.get("access:token");
         if (StringUtils.isEmpty(accessToken)) {
-            JSONObject jsonObject = WechatUtil.getAccessToken(code);
+            JSONObject jsonObject = WechatUtil.getAccessToken(authenticationDTO.getPhonenumbecode());
+            log.info("微信token返回：" + JsonUtils.toString(jsonObject));
             accessToken = jsonObject.getString("access_token");
             Integer expireTime = jsonObject.getInteger("expires_in");
             RedisUtil.set("access:token", accessToken, expireTime - 10);
         }
-        R<WxPhoneInfoDto> wxPhoneInfo = wxService.getWxPhoneInfo(accessToken, phonenumbecode);
+        R<WxPhoneInfoDto> wxPhoneInfo = wxService.getWxPhoneInfo(accessToken, authenticationDTO.getPhonenumbecode());
         User user = getUser(wxPhoneInfo.getResult().getPhoneInfo().getPurePhoneNumber());
-        R<CodeSessionDto> r = wxService.code2Session(code);
+        R<CodeSessionDto> r = wxService.code2Session(authenticationDTO.getPrincipal());
         UserInfoInTokenBO userInfoInToken = new UserInfoInTokenBO();
         if (user == null) {
             User userNew = new User();
             userNew.setModifyTime(new Date());
             userNew.setUserRegtime(new Date());
             userNew.setStatus(1);
+            userNew.setUserMobile(wxPhoneInfo.getResult().getPhoneInfo().getPurePhoneNumber());
             userNew.setNickName(RichBornStringUtils.hideSubString(wxPhoneInfo.getResult().getPhoneInfo().getPurePhoneNumber(), 3, 4, '*'));
-            userNew.setUserMail("");
-            user.setLoginPassword("");
             String userId = IdUtil.simpleUUID();
-            user.setUserId(userId);
-            userService.save(user);
+            userNew.setUserId(userId);
+            userService.save(userNew);
+            user = userNew;
         }
         userInfoInToken.setUserId(user.getUserId());
         userInfoInToken.setSysType(SysTypeEnum.ORDINARY.value());
@@ -115,6 +120,7 @@ public class LoginController {
         userInfoInToken.setOpenId(r.getResult().getOpenid());
         userInfoInToken.setSessionKey(r.getResult().getSession_key());
         userInfoInToken.setUnionId(r.getResult().getUnionid());
+        userInfoInToken.setNickName(user.getNickName());
 
         // 存储token返回vo
         TokenInfoVO tokenInfoVO = tokenStore.storeAndGetVo(userInfoInToken);
@@ -138,7 +144,7 @@ public class LoginController {
             user = userMapper.selectOneByUserName(mobileOrUserName);
         }
         if (user == null) {
-            throw new YamiShopBindException("账号或密码不正确");
+            return null;
         }
         return user;
     }
